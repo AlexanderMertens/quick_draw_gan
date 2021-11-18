@@ -21,3 +21,13 @@ def load_data(path, full_size=1000, verbose=False):
 
 def split_data(data, Y, test_size=0.2):
     return train_test_split(data, Y, test_size=test_size)
+
+
+def create_cats_and_dogs_data(size=5000):
+    cats_data = load_data(path=CAT_DATA_PATH, full_size=size)
+    cats_y = np.zeros(size)
+    dogs_data = load_data(path=DOG_DATA_PATH, full_size=size)
+    dogs_y = np.ones(size)
+    data = np.concatenate((cats_data, dogs_data))
+    Y = np.concatenate((cats_y, dogs_y))
+    return split_data(data, Y)
