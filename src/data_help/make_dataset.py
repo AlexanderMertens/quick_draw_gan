@@ -16,10 +16,8 @@ def load_data(path, full_size=1000, verbose=False):
 
     # resize data to fit in [0, 1]
     data = (data.astype(np.float32)) / 255
-    return np.reshape(data, (full_size, 28, 28))
+    return np.reshape(data, (full_size, 28, 28, 1))
 
 
 def split_data(data, Y, test_size=0.2):
-    (x_train, y_train, x_test, y_test) = train_test_split(
-        data, Y, test_size=test_size)
-    return (x_train, y_train, x_test, y_test)
+    return train_test_split(data, Y, test_size=test_size)
