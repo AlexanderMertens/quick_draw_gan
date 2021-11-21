@@ -2,8 +2,13 @@ import numpy as np
 from numpy.core.fromnumeric import size
 from sklearn.model_selection import train_test_split
 
+from data_help.data_transform import convert_to_array
+
 DOG_DATA_PATH = "./data/raw/dog.npy"
 CAT_DATA_PATH = "./data/raw/cat.npy"
+
+IMAGE_WIDTH = 28
+INPUT_LENGTH = 784
 
 
 def load_data(path, full_size=1000, verbose=False):
@@ -16,7 +21,7 @@ def load_data(path, full_size=1000, verbose=False):
 
     # resize data to fit in [0, 1]
     data = (data.astype(np.float32)) / 255
-    return np.reshape(data, (full_size, 28, 28, 1))
+    return convert_to_array(data)
 
 
 def split_data(data, Y, test_size=0.2):

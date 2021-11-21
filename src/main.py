@@ -1,8 +1,6 @@
-from matplotlib import pyplot as plt
-import numpy as np
-from data_help.make_dataset import CAT_DATA_PATH, DOG_DATA_PATH, create_cats_and_dogs_data, load_data, split_data
+from data_help.make_dataset import CAT_DATA_PATH, DOG_DATA_PATH, create_cats_and_dogs_data
 from models.build_model import build_discriminator
-from visualization.visualise import plot_history, plot_images, visualize_training_data
+from visualization.visualise import plot_history
 
 
 size = 5000

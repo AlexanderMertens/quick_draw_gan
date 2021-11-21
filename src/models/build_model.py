@@ -1,11 +1,16 @@
 from tensorflow import keras
 
+from data_help.make_dataset import INPUT_LENGTH
 
-def build_discriminator(num_filters=8, filter_size=3, pool_size=2):
+
+def build_discriminator():
     model = keras.models.Sequential([
-        keras.layers.Conv2D(num_filters, filter_size, input_shape=(28, 28, 1)),
-        keras.layers.MaxPooling2D(pool_size=pool_size),
-        keras.layers.Flatten(),
+        keras.models.Dense(512, input_dim=INPUT_LENGTH),
+        keras.models.LeakyReLU(0.2),
+        keras.models.Dropout(0.3),
+        keras.models.Dense(256),
+        keras.models.LeakyReLU(0.2),
+        keras.models.Dropout(0.3),
         keras.layers.Dense(1, activation='sigmoid')
     ])
 
@@ -21,7 +26,7 @@ def build_generator():
         keras.layers.LeakyReLU(0.3),
         keras.layers.Dense(256),
         keras.layers.LeakyReLU(0.3),
-        keras.layers.Dense(784, activation='tanh')
+        keras.layers.Dense(INPUT_LENGTH, activation='tanh')
     ])
 
     return model
