@@ -2,7 +2,7 @@ import numpy as np
 import data_help.data_constants as dc
 from sklearn.model_selection import train_test_split
 
-from data_help.data_transform import convert_to_array
+from data_help.data_transform import convert_to_image
 
 
 def load_data(path, full_size=1000, verbose=False):
@@ -15,7 +15,7 @@ def load_data(path, full_size=1000, verbose=False):
 
     # resize data to fit in [0, 1]
     data = (data.astype(np.float32)) / 255
-    return convert_to_array(data)
+    return convert_to_image(data)
 
 
 def generate_random_data(num_samples):
