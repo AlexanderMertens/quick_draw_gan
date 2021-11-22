@@ -4,3 +4,4 @@ LATENT_DIM = 100
 
 DOG_DATA_PATH = "./data/raw/dog.npy"
 CAT_DATA_PATH = "./data/raw/cat.npy"
+ENVELOPE_DATA_PATH = "./data/raw/envelope.npy"
