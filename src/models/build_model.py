@@ -1,11 +1,11 @@
 from tensorflow import keras
 
-INPUT_LENGTH = 784
+import data_help.data_constants as dc
 
 
 def build_discriminator():
     model = keras.models.Sequential([
-        keras.layers.Dense(512, input_dim=INPUT_LENGTH),
+        keras.layers.Dense(512, input_dim=dc.INPUT_LENGTH),
         keras.layers.LeakyReLU(0.2),
         keras.layers.Dropout(0.3),
         keras.layers.Dense(256),
@@ -21,11 +21,11 @@ def build_discriminator():
 
 def build_generator():
     model = keras.models.Sequential([
-        keras.layers.Dense(128, input_dim=INPUT_LENGTH),
+        keras.layers.Dense(128, input_dim=dc.LATENT_DIM),
         keras.layers.LeakyReLU(0.3),
         keras.layers.Dense(256),
         keras.layers.LeakyReLU(0.3),
-        keras.layers.Dense(INPUT_LENGTH, activation='tanh')
+        keras.layers.Dense(dc.INPUT_LENGTH, activation='tanh')
     ])
 
     model.compile('adam', loss='binary_crossentropy',

@@ -10,33 +10,32 @@ from visualization.visualise import plot_images
 
 def train_model(num_epochs, batch_size=256):
     num_batch = 16
-    n = (num_batch * 5) // 8
-    full_size = n * batch_size
+    full_size = num_batch * batch_size
 
     data = load_data(path=dc.DOG_DATA_PATH, full_size=full_size)
-    y = np.ones(full_size)
-    fake_data = generate_random_data(full_size)
-    fake_y = np.zeros(full_size)
-
-    X_train, X_val, y_train, y_val = split_data(
-        np.concatenate((data, fake_data)), np.concatenate((y, fake_y)), test_size=1/5)
 
     generator, discriminator, gan = build_GAN()
     for epoch in range(num_epochs):
         for batch in tqdm(range(num_batch), desc="Epoch {}".format(epoch)):
-            start = batch * batch_size
-            end = (batch + 1) * batch_size
-            X = X_train[start:end]
-            y = y_train[start:end]
-
             discriminator.trainable = True
-            d_loss = discriminator.train_on_batch(X, y)
+
+            # train discriminator
+            X = data[np.random.randint(0, data.shape[0], size=batch_size)]
+            y = np.ones(batch_size)
+            d_loss_real = discriminator.train_on_batch(X, y)[1]
 
             noise = generate_random_data(batch_size)
-            y = np.ones(batch_size)
+            X = generator.predict(noise)
+            y = np.zeros(batch_size)
+            d_loss_fake = discriminator.train_on_batch(X, y)[1]
+
+            # train generator
             discriminator.trainable = False
-            g_loss = gan.train_on_batch(noise, y)
-            print("disc loss:{}, gan loss:{}".format(d_loss, g_loss))
+            noise = generate_random_data(batch_size)
+            y = np.ones(batch_size)
+            g_loss = gan.train_on_batch(noise, y)[1]
+            print("disc loss real:{}, disc loss fake:{}, gan loss:{}".format(
+                d_loss_real, d_loss_fake, g_loss))
 
     noise = generate_random_data(100)
     prediction = generator.predict(noise)

@@ -19,7 +19,7 @@ def load_data(path, full_size=1000, verbose=False):
 
 
 def generate_random_data(num_samples):
-    return np.random.normal(0.5, 0.5, (num_samples, dc.INPUT_LENGTH))
+    return np.random.normal(0, 1, (num_samples, dc.LATENT_DIM))
 
 
 def split_data(data, Y, test_size=0.2):
