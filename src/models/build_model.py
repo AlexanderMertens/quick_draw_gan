@@ -11,20 +11,17 @@ def build_discriminator():
     model = keras.models.Sequential([
         # In: 28 x 28 x 1, depth = 1
         # Out: 14 x 14 x 1, depth=64
-        keras.layers.Conv2D(depth, 5, strides=2,
+        # [(W−K+2P)/S]+1
+        keras.layers.Conv2D(depth, kernel_size=4, strides=2,
                             input_shape=input_shape, padding='same'),
         keras.layers.LeakyReLU(alpha=0.2),
         keras.layers.Dropout(dropout),
 
-        keras.layers.Conv2D(depth*2, 5, strides=2, padding='same'),
+        keras.layers.Conv2D(depth*2, kernel_size=4, strides=2, padding='same'),
         keras.layers.LeakyReLU(alpha=0.2),
         keras.layers.Dropout(dropout),
 
-        keras.layers.Conv2D(depth*4, 5, strides=2, padding='same'),
-        keras.layers.LeakyReLU(alpha=0.2),
-        keras.layers.Dropout(dropout),
-
-        keras.layers.Conv2D(depth*8, 5, strides=1, padding='same'),
+        keras.layers.Conv2D(depth*2, kernel_size=4, strides=1, padding='same'),
         keras.layers.LeakyReLU(alpha=0.2),
         keras.layers.Dropout(dropout),
 
@@ -34,7 +31,7 @@ def build_discriminator():
         keras.layers.Activation('sigmoid'),
     ])
 
-    model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.0002), loss='binary_crossentropy',
+    model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.0001), loss='binary_crossentropy',
                   metrics=['binary_accuracy'])
     return model
 
@@ -83,6 +80,6 @@ def build_GAN():
         generator,
         discriminator
     ])
-    gan.compile(optimizer=keras.optimizers.Adam(learning_rate=0.0001), loss='binary_crossentropy',
+    gan.compile(optimizer=keras.optimizers.Adam(learning_rate=0.005), loss='binary_crossentropy',
                 metrics=['binary_accuracy'])
     return generator, discriminator, gan

@@ -13,8 +13,8 @@ def load_data(path, full_size=1000, verbose=False):
         print(data.dtype)
         print("----------")
 
-    # resize data to fit in [0, 1]
-    data = (data.astype(np.float32)) / 255
+    # resize data to fit in [-1, 1]
+    data = (data.astype(np.float32)) / 127.5 - 1
     return convert_to_image(data)
 
 
