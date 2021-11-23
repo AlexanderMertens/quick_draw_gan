@@ -12,9 +12,8 @@ def train_model(num_epochs, num_batch=4, batch_size=16):
     full_size = num_batch * batch_size
 
     data = load_data(path=dc.ENVELOPE_DATA_PATH, full_size=full_size)
-    real = np.ones((batch_size // 2, 1))
-    fake = np.zeros((batch_size // 2, 1))
-
+    real_and_fake = np.concatenate(
+        (np.ones((batch_size // 2, 1)), np.zeros((batch_size // 2, 1))))
     ones = np.ones((batch_size, 1))
 
     generator, discriminator, gan = build_GAN()
@@ -25,17 +24,11 @@ def train_model(num_epochs, num_batch=4, batch_size=16):
             # train discriminator
             images_real = data[np.random.randint(
                 0, data.shape[0], size=batch_size//2)]
-
-            # d_loss_real = discriminator.train_on_batch(images_real, real)
-
             images_fake = generator.predict(
                 generate_random_data(batch_size//2))
-            # d_loss_fake = discriminator.train_on_batch(
-            # images_fake, fake)
-            d_loss_fake = 0
+
             images = np.concatenate((images_real, images_fake))
-            y = np.concatenate((real, fake))
-            d_loss_real = discriminator.train_on_batch(images, y)
+            d_loss_real = discriminator.train_on_batch(images, real_and_fake)
 
             # train generator
             discriminator.trainable = False
