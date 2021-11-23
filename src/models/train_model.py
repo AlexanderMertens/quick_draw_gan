@@ -25,12 +25,17 @@ def train_model(num_epochs, num_batch=4, batch_size=16):
             # train discriminator
             images_real = data[np.random.randint(
                 0, data.shape[0], size=batch_size//2)]
-            d_loss_real = discriminator.train_on_batch(images_real, real)
+
+            # d_loss_real = discriminator.train_on_batch(images_real, real)
 
             images_fake = generator.predict(
                 generate_random_data(batch_size//2))
-            d_loss_fake = discriminator.train_on_batch(
-                images_fake, fake)
+            # d_loss_fake = discriminator.train_on_batch(
+            # images_fake, fake)
+            d_loss_fake = 0
+            images = np.concatenate((images_real, images_fake))
+            y = np.concatenate((real, fake))
+            d_loss_real = discriminator.train_on_batch(images, y)
 
             # train generator
             discriminator.trainable = False
