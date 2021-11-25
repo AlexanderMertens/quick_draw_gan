@@ -74,3 +74,4 @@ def train_model(num_epochs, num_batch=4, batch_size=16):
     # plot metrics
     plot_metrics(d_loss_avg=d_loss_avg, d_accuracy_avg=d_accuracy_avg,
                  g_loss_avg=g_loss_avg, g_accuracy_avg=g_accuracy_avg)
+    return gan
