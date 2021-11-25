@@ -3,6 +3,7 @@ import numpy as np
 import data_help.data_constants as dc
 
 from mlflow.tracking.fluent import log_param
+from mlflow.keras import log_model
 from tqdm import tqdm
 from data_help.data_transform import convert_to_image
 from data_help.make_dataset import generate_random_data, load_data
@@ -10,7 +11,7 @@ from models.build_model import build_GAN
 from visualization.visualise import plot_images, plot_metrics
 
 
-def train_model(num_epochs, num_batch=4, batch_size=16):
+def train_model(num_epochs, num_batch=4, batch_size=16, run_name=''):
     log_param('num_epochs', num_epochs)
     log_param('num_batch', num_batch)
     log_param('batch_size', batch_size)
@@ -21,6 +22,7 @@ def train_model(num_epochs, num_batch=4, batch_size=16):
     real_and_fake = np.concatenate(
         (np.ones((batch_size // 2, 1)), np.zeros((batch_size // 2, 1))))
     ones = np.ones((batch_size, 1))
+    fixed_noise = generate_random_data(100)
 
     generator, discriminator, gan = build_GAN()
     d_loss_avg = []
@@ -61,10 +63,11 @@ def train_model(num_epochs, num_batch=4, batch_size=16):
             g_accuracy_batch.append(g_accuracy)
 
         if epoch % 1 == 0:
-            noise = generate_random_data(100)
-            images = convert_to_image(generator.predict(noise))
+            images = convert_to_image(generator.predict(fixed_noise))
             plot_images(
                 images, path="figures/results/epoch_{}".format(epoch), show=False, save=True)
+            log_model(gan, 'my-model-{}-epoch-{}'.format(run_name, epoch),
+                      conda_env='./conda.yaml')
         # record metrics
         d_loss_avg.append(sum(d_loss_batch) / num_batch)
         d_accuracy_avg.append(sum(d_accuracy_batch) / num_batch)

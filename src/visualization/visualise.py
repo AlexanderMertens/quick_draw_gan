@@ -38,6 +38,7 @@ def plot_metrics(d_loss_avg, d_accuracy_avg, g_loss_avg, g_accuracy_avg):
     plot_metric(fig, d_accuracy_avg, 'Discriminator accuracy', position=2)
     plot_metric(fig, g_loss_avg, 'GAN loss', position=3)
     plot_metric(fig, g_accuracy_avg, 'GAN accuracy', position=4)
+    fig.tight_layout()
     fig.savefig('./figures/results/metrics.png')
     plt.close(fig)
 
