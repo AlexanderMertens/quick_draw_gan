@@ -9,3 +9,7 @@ def convert_to_image(data):
 
 def convert_to_array(data):
     return np.reshape(data, (data.shape[0], dc.INPUT_LENGTH))
+
+
+def flip_images(data):
+    return np.flip(data, 2)

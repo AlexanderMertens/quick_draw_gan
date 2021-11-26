@@ -7,13 +7,15 @@ def visualize_training_data(images, amount_rows=10, show=False, save=False):
                 amount_rows=amount_rows, show=show, save=save)
 
 
-def plot_images(images, path=None, amount_rows=10, show=True, save=False):
+def plot_images(images, path=None, amount_rows=10, show=True, save=False, numbering=None):
     amount = amount_rows * 10
     fig = plt.figure(figsize=(amount_rows, 10))
     for i in range(amount):
         ax = fig.add_subplot(amount_rows, 10, i+1)
         ax.imshow(images[i], cmap='gray_r')
         ax.axis('off')
+        if numbering is not None:
+            ax.set_title(numbering[i])
     fig.tight_layout()
     if save:
         fig.savefig(path)

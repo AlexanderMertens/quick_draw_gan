@@ -6,7 +6,7 @@ from data_help.data_transform import convert_to_image
 
 
 def load_data(path, full_size=1000, verbose=False):
-    data = np.load(path)[0:full_size]
+    data = simple_load_data(path, full_size=full_size)
     if verbose:
         print("--data metadata--")
         print(data.shape)
@@ -16,6 +16,10 @@ def load_data(path, full_size=1000, verbose=False):
     # resize data to fit in [-1, 1]
     data = (data.astype(np.float32)) / 255
     return convert_to_image(data)
+
+
+def simple_load_data(path, full_size):
+    return np.load(path)[0:full_size]
 
 
 def generate_random_data(num_samples):
