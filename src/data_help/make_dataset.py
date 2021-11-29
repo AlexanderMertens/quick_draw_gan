@@ -14,7 +14,7 @@ def load_data(path, full_size=1000, verbose=False):
         print("----------")
 
     # resize data to fit in [-1, 1]
-    data = (data.astype(np.float32)) / 255
+    data = (data.astype(np.float32) - 127.5) / 127.5
     return convert_to_image(data)
 
 
@@ -22,8 +22,21 @@ def simple_load_data(path, full_size):
     return np.load(path)[0:full_size]
 
 
-def generate_random_data(num_samples):
+def generate_latent_points(num_samples):
     return np.random.normal(0, 1, (num_samples, dc.LATENT_DIM))
+
+
+def generate_fake_data(generator, num_samples):
+    latent_points = generate_latent_points(num_samples)
+    X = generator.predict(latent_points)
+    y = np.ones((num_samples, 1))
+    return X, y
+
+
+def generate_real_data(data, num_samples):
+    X = data[np.random.randint(0, data.shape[0], num_samples)]
+    y = -np.ones((num_samples, 1))
+    return X, y
 
 
 def split_data(data, Y, test_size=0.2):

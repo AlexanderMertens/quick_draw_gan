@@ -8,41 +8,38 @@ def build_discriminator():
     depth = 64
     dropout = 0.4
     kernel_size = 5
+    constraint = ClipConstraint(0.01)
     input_shape = (dc.IMAGE_WIDTH, dc.IMAGE_WIDTH, 1)
 
     log_param('Discriminator depth', depth)
     log_param('Discriminator dropout rate', dropout)
     log_param('Discriminator kernel size', kernel_size)
     model = keras.models.Sequential([
-        # In: 28 x 28 x 1, depth = 1
-        # Out: 14 x 14 x 1, depth=64
-        # [(W−K+2P)/S]+1
-        keras.layers.Conv2D(depth, kernel_size=kernel_size, strides=2,
+        # In: (28, 28, 1)
+        keras.layers.Conv2D(depth, kernel_size=kernel_size, strides=2, kernel_constraint=constraint,
                             input_shape=input_shape, padding='same'),
         keras.layers.Dropout(dropout),
 
-        keras.layers.Conv2D(depth*2, kernel_size=kernel_size,
+        keras.layers.Conv2D(depth*2, kernel_size=kernel_size, kernel_constraint=constraint,
                             strides=2, padding='same'),
         keras.layers.Dropout(dropout),
 
-        keras.layers.Conv2D(depth*4, kernel_size=kernel_size,
+        keras.layers.Conv2D(depth*4, kernel_size=kernel_size, kernel_constraint=constraint,
                             strides=2, padding='same'),
         keras.layers.Dropout(dropout),
 
-        keras.layers.Conv2D(depth*8, kernel_size=kernel_size,
+        keras.layers.Conv2D(depth*8, kernel_size=kernel_size, kernel_constraint=constraint,
                             strides=1, padding='same'),
         keras.layers.Dropout(dropout),
 
-        # Out: 1-dim probability
         keras.layers.Flatten(),
         keras.layers.Dense(1),
-        keras.layers.Activation('sigmoid'),
     ])
 
-    lr = 0.0001
+    lr = 0.00005
     log_param('Discriminator learning rate', lr)
-    model.compile(optimizer=keras.optimizers.Adam(learning_rate=lr), loss='binary_crossentropy',
-                  metrics=['binary_accuracy'])
+    opt = keras.optimizers.RMSprop(lr=lr)
+    model.compile(optimizer=opt, loss=wasserstein_loss)
     return model
 
 
@@ -75,9 +72,9 @@ def build_generator():
         keras.layers.BatchNormalization(axis=-1, momentum=0.9),
         keras.layers.Activation('relu'),
 
-        # Out: 28 x 28 x 1 grayscale image [0.0,1.0] per pix
+        # Out: 28 x 28 x 1 grayscale image [-1, 1] per pix
         keras.layers.Conv2DTranspose(1, 5, padding='same'),
-        keras.layers.Activation('sigmoid')
+        keras.layers.Activation('tanh')
     ])
 
     return model
@@ -91,8 +88,27 @@ def build_GAN():
         generator,
         discriminator
     ])
-    lr = 0.0002
+    lr = 0.00005
     log_param('Generator learning rate', lr)
-    gan.compile(optimizer=keras.optimizers.Adam(learning_rate=lr), loss='binary_crossentropy',
-                metrics=['binary_accuracy'])
+    opt = keras.optimizers.RMSprop(lr=lr)
+    gan.compile(optimizer=opt, loss=wasserstein_loss)
     return generator, discriminator, gan
+
+
+def wasserstein_loss(y_true, y_pred):
+    return keras.backend.mean(y_true * y_pred)
+
+
+class ClipConstraint(keras.constraints.Constraint):
+    # clip model weights to a given hypercube
+    # set clip value when initialized
+    def __init__(self, clip_value):
+        self.clip_value = clip_value
+
+    # clip model weights to hypercube
+    def __call__(self, weights):
+        return keras.backend.clip(weights, -self.clip_value, self.clip_value)
+
+    # get the config
+    def get_config(self):
+        return {'clip_value': self.clip_value}
