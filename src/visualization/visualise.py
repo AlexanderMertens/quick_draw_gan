@@ -34,16 +34,18 @@ def plot_history(history, columns=['loss'], titles=['loss']):
     plt.show()
 
 
-def plot_metrics(loss_array, title_array):
+def plot_metrics(d_loss_avg, d_accuracy_avg, g_loss_avg, g_accuracy_avg):
     fig = plt.figure()
-    for loss, title, position in zip(loss_array, title_array, range(len(loss_array))):
-        plot_metric(fig, loss, title, position + 1)
+    plot_metric(fig, d_loss_avg, 'Discriminator loss', position=1)
+    plot_metric(fig, d_accuracy_avg, 'Discriminator accuracy', position=2)
+    plot_metric(fig, g_loss_avg, 'GAN loss', position=3)
+    plot_metric(fig, g_accuracy_avg, 'GAN accuracy', position=4)
     fig.tight_layout()
     fig.savefig('./figures/results/metrics.png')
     plt.close(fig)
 
 
-def plot_metric(figure, metric, name, rows=2, columns=1, position=1):
+def plot_metric(figure, metric, name, rows=2, columns=2, position=1):
     ax = figure.add_subplot(rows, columns, position)
     ax.plot(metric)
     ax.set_title(name)
