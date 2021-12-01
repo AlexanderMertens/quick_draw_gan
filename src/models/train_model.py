@@ -18,7 +18,7 @@ def train_model(num_epochs, num_batch=4, batch_size=16, run_name=''):
 
     full_size = num_batch * batch_size
 
-    data = load_data(path=dc.ENVELOPE_DATA_PATH, full_size=full_size)
+    data = load_data(path=dc.FILTERED_DOG_DATA_PATH, full_size=full_size)
     real_and_fake = np.concatenate(
         (np.ones((batch_size // 2, 1)), np.zeros((batch_size // 2, 1))))
     ones = np.ones((batch_size, 1))
@@ -62,10 +62,10 @@ def train_model(num_epochs, num_batch=4, batch_size=16, run_name=''):
             g_loss_batch.append(g_loss)
             g_accuracy_batch.append(g_accuracy)
 
-        if epoch % 1 == 0:
-            images = convert_to_image(generator.predict(fixed_noise))
-            plot_images(
-                images, path="figures/results/epoch_{}".format(epoch), show=False, save=True)
+        images = convert_to_image(generator.predict(fixed_noise))
+        plot_images(
+            images, path="figures/results/epoch_{}".format(epoch), show=False, save=True)
+        if (epoch + 1) % 10 == 0:
             log_model(gan, 'my-model-{}-epoch-{}'.format(run_name, epoch),
                       conda_env='./conda.yaml')
         # record metrics

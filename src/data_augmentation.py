@@ -7,7 +7,7 @@ from data_help.make_dataset import simple_load_data
 
 
 full_size = 10000
-images = simple_load_data(dc.ENVELOPE_DATA_PATH, full_size=full_size)
+images = simple_load_data(dc.FILTERED_BUTTERFLY_DATA_PATH, full_size=full_size)
 images = convert_to_image(images)
 length = 100
 proper_images = np.ones((1, 28, 28, 1))
@@ -18,11 +18,15 @@ for i in range(0, full_size, length):
     to_remove = []
     while True:
         x = input('Enter index to remove: >> ')
-        if x == 'q':
+        if not x.isdigit() or int(x) > 100:
             break
         to_remove.append(int(x))
 
     filtered_images = np.delete(selection, to_remove, axis=0)
     proper_images = np.append(proper_images, filtered_images, axis=0)
-
-np.save(dc.FILTERED_ENVELOPE_DATA_PATH, proper_images[1:])
+    if (i + length) % (10 * length) == 0:
+        print('Progress saved')
+        np.save('{}_{}.npy'.format(dc.FILTERED_BUTTERFLY_DATA_PATH, i),
+                proper_images[1:])
+np.save(dc.FILTERED_BUTTERFLY_DATA_PATH, proper_images[1:])
+quit()
