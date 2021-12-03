@@ -9,3 +9,4 @@ ENVELOPE_DATA_PATH = "./data/raw/envelope.npy"
 FILTERED_ENVELOPE_DATA_PATH = 'data/filtered/envelope.npy'
 BUTTERFLY_DATA_PATH = "./data/raw/butterfly.npy"
 FILTERED_BUTTERFLY_DATA_PATH = "./data/filtered/butterfly.npy"
+FILTERED_BUTTERFLY_DATA_PATH_OLD = "./data/filtered/butterfly-old.npy"

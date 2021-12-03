@@ -5,7 +5,7 @@ import data_help.data_constants as dc
 
 
 def build_discriminator():
-    depth = 32
+    depth = 64
     dropout = 0.4
     kernel_size = 3
     input_shape = (dc.IMAGE_WIDTH, dc.IMAGE_WIDTH, 1)
@@ -65,6 +65,11 @@ def build_generator():
 
         keras.layers.Conv2DTranspose(
             int(depth/4), kernel_size=kernel_size, strides=1, padding='same'),
+        keras.layers.BatchNormalization(axis=-1, momentum=0.9),
+        keras.layers.LeakyReLU(alpha=0.02),
+
+        keras.layers.Conv2DTranspose(
+            int(depth/8), kernel_size=kernel_size, strides=1, padding='same'),
         keras.layers.BatchNormalization(axis=-1, momentum=0.9),
         keras.layers.LeakyReLU(alpha=0.02),
 

@@ -17,10 +17,13 @@ def train_model(num_epochs, num_batch=4, batch_size=16, run_name=''):
     log_param('batch_size', batch_size)
 
     full_size = num_batch * batch_size
+    half_batch = batch_size // 2
 
-    data = load_data(path=dc.FILTERED_DOG_DATA_PATH, full_size=full_size)
-    real_and_fake = np.concatenate(
-        (np.ones((batch_size // 2, 1)), np.zeros((batch_size // 2, 1))))
+    data = load_data(path=dc.FILTERED_BUTTERFLY_DATA_PATH, full_size=full_size)
+    # real_and_fake = np.concatenate(
+    #     (np.ones((batch_size // 2, 1)), np.zeros((batch_size // 2, 1))))
+    y_real = np.ones((half_batch, 1))
+    y_fake = np.zeros((half_batch, 1))
     ones = np.ones((batch_size, 1))
     fixed_noise = generate_random_data(100)
 
@@ -41,12 +44,15 @@ def train_model(num_epochs, num_batch=4, batch_size=16, run_name=''):
             # train discriminator
             images_real = data[np.random.randint(
                 0, data.shape[0], size=batch_size//2)]
+            d_loss_real, d_accuracy_real = discriminator.train_on_batch(
+                images_real, y_real)
+
             images_fake = generator.predict(
                 generate_random_data(batch_size//2))
-
-            images = np.concatenate((images_real, images_fake))
-            d_loss, d_accuracy = discriminator.train_on_batch(
-                images, real_and_fake)
+            d_loss_fake, d_accuracy_fake = discriminator.train_on_batch(
+                images_fake, y_fake)
+            d_loss = (d_loss_real + d_loss_fake) / 2
+            d_accuracy = (d_accuracy_real + d_accuracy_fake) / 2
 
             # train generator
             discriminator.trainable = False
@@ -64,7 +70,7 @@ def train_model(num_epochs, num_batch=4, batch_size=16, run_name=''):
 
         images = convert_to_image(generator.predict(fixed_noise))
         plot_images(
-            images, path="figures/results/epoch_{}".format(epoch), show=False, save=True)
+            images, path="figures/results/epoch_{:003d}".format(epoch), show=False, save=True)
         if (epoch + 1) % 10 == 0:
             log_model(gan, 'my-model-{}-epoch-{}'.format(run_name, epoch),
                       conda_env='./conda.yaml')
