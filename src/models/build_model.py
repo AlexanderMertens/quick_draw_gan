@@ -1,14 +1,19 @@
 from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Conv2D, BatchNormalization, LeakyReLU, Flatten, Dense, Activation, Conv2DTranspose, Reshape
 from tensorflow.python.keras.optimizer_v2.adam import Adam
+from azureml.core import Run
 
 import data_help.data_constants as dc
 
 
-def build_discriminator(run):
+def build_discriminator():
+    run_logger = Run.get_context()
+
     depth = 32
     dropout = 0.4
     kernel_size = 3
+    run_logger.log('Discriminator depth', depth)
+    run_logger.log('Discriminator kernel size', kernel_size)
     input_shape = (dc.IMAGE_WIDTH, dc.IMAGE_WIDTH, 1)
 
     model = Sequential([
@@ -42,11 +47,14 @@ def build_discriminator(run):
     return model
 
 
-def build_generator(run):
+def build_generator():
     dropout = 0.4
     depth = 256
     dim = 7
     kernel_size = 3
+    run_logger = Run.get_context()
+    run_logger.log('Generator depth', depth)
+    run_logger.log('Generator kernel size', kernel_size)
 
     model = Sequential([
         Dense(dim*dim*depth, input_dim=dc.LATENT_DIM),
@@ -76,9 +84,9 @@ def build_generator(run):
     return model
 
 
-def build_GAN(run):
-    discriminator = build_discriminator(run)
-    generator = build_generator(run)
+def build_GAN():
+    discriminator = build_discriminator()
+    generator = build_generator()
     discriminator.trainable = False
     gan = Sequential([
         generator,

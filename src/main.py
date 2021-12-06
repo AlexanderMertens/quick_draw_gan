@@ -1,20 +1,22 @@
-from azureml.core.experiment import Experiment
-from azureml.core.workspace import Workspace
+import argparse
+import logging
 import tensorflow as tf
 
 from models.train_model import train_model
 
+if __name__ == "__main__":
+    logger = tf.get_logger()
+    logger.setLevel(logging.ERROR)
 
-subscription_id = 'a8260178-3b6d-4bce-a07e-3aae8c7a62af'
-resource_group = 'RG_GAN_internship'
-workspace_name = 'Quick_Draw_Project'
+    parser = argparse.ArgumentParser(description="Train GAN")
+    parser.add_argument('-e', '--epochs', type=int,
+                        default=10, help="Amount of epochs")
+    parser.add_argument('-b', '--batches', type=int,
+                        default=16, help="Amount of batches")
+    parser.add_argument('-s', '--size', type=int,
+                        default=128, help="Size of batches")
 
-ws = Workspace(subscription_id, resource_group, workspace_name)
+    args = parser.parse_args()
 
-experiment = Experiment(workspace=ws, name='12-06-experiment-train')
-run = experiment.start_logging(
-    outputs=None, snapshot_directory='.', display_name='First trial')
-
-gan = train_model(run=run, num_epochs=2, num_batch=4,
-                  batch_size=16)
-run.complete()
+    gan = train_model(num_epochs=args.epochs, num_batch=args.batches,
+                      batch_size=args.size)
