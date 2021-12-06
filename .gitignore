@@ -6,3 +6,4 @@ dog_data_*.png
 figures/
 weights/
 mlruns/
+outputs/

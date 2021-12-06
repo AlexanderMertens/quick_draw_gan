@@ -1,7 +1,7 @@
 import numpy as np
+import tensorflow as tf
 import data_help.data_constants as dc
 
-from tqdm import tqdm
 from data_help.data_transform import convert_to_image
 from data_help.make_dataset import generate_random_data, load_data
 from models.build_model import build_GAN
@@ -70,10 +70,15 @@ def train_model(num_epochs, num_batch=4, batch_size=16):
 
         images = convert_to_image(generator.predict(fixed_noise))
         plot_images(
-            images, path="/tmp/results/epoch_{:003d}".format(epoch), show=False, save=True)
-        # if (epoch + 1) % 10 == 0:
-        #     log_model(gan, 'my-model-{}-epoch-{}'.format(run_name, epoch),
-        #               conda_env='./conda.yaml')
+            images, path="./outputs/figures/epoch_{:003d}".format(epoch), show=False, save=True)
+        # Save models
+        if (epoch + 1) % 10 == 0:
+            gen_path = './outputs/generator_epoch_{:003d}'.format(epoch + 1)
+            disc_path = './outputs/discriminator_epoch_{:003d}'.format(
+                epoch + 1)
+            tf.saved_model.save(generator, gen_path)
+            tf.saved_model.save(discriminator, disc_path)
+
         # record metrics
         for metric_array, batch_array in zip(metrics_avg, metrics_batch):
             metric_array.append(sum(batch_array) / num_batch)
@@ -85,5 +90,4 @@ def train_model(num_epochs, num_batch=4, batch_size=16):
     run_logger.log_list('Discriminator accuracy', metrics_avg[DISC_ACC_ID])
     run_logger.log_list('GAN loss', metrics_avg[GEN_LOSS_ID])
     run_logger.log_list('GAN accuracy', metrics_avg[GEN_ACC_ID])
-    run_logger.upload_folder('images results', '/tmp/results')
-    return gan
+    return discriminator, generator

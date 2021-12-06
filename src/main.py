@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 import tensorflow as tf
 
 from models.train_model import train_model
@@ -7,6 +8,7 @@ from models.train_model import train_model
 if __name__ == "__main__":
     logger = tf.get_logger()
     logger.setLevel(logging.ERROR)
+    os.makedirs('./outputs/figures')
 
     parser = argparse.ArgumentParser(description="Train GAN")
     parser.add_argument('-e', '--epochs', type=int,
@@ -18,5 +20,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    gan = train_model(num_epochs=args.epochs, num_batch=args.batches,
-                      batch_size=args.size)
+    discriminator, generator = train_model(
+        num_epochs=args.epochs, num_batch=args.batches, batch_size=args.size)
+
+    tf.saved_model.save(discriminator, './outputs/final_discriminator')
+    tf.saved_model.save(generator, './outputs/final_generator')
