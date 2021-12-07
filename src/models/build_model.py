@@ -6,7 +6,7 @@ from azureml.core import Run
 import data_help.data_constants as dc
 
 
-def build_discriminator():
+def build_discriminator() -> Sequential:
     run_logger = Run.get_context()
 
     depth = 32
@@ -47,7 +47,7 @@ def build_discriminator():
     return model
 
 
-def build_generator():
+def build_generator() -> Sequential:
     dropout = 0.4
     depth = 256
     dim = 7
@@ -84,7 +84,7 @@ def build_generator():
     return model
 
 
-def build_GAN():
+def build_GAN() -> Sequential:
     discriminator = build_discriminator()
     generator = build_generator()
     discriminator.trainable = False

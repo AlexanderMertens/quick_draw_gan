@@ -1,12 +1,14 @@
 import numpy as np
 import tensorflow as tf
+import sys
 import data_help.data_constants as dc
 
+from azureml.core import Run
 from data_help.data_transform import convert_to_image
 from data_help.make_dataset import generate_random_data, load_data
 from models.build_model import build_GAN
 from visualization.visualise import plot_images, plot_metrics
-from azureml.core import Run
+from tqdm import tqdm
 
 DISC_LOSS_ID = 0
 DISC_ACC_ID = 1
@@ -14,15 +16,13 @@ GEN_LOSS_ID = 2
 GEN_ACC_ID = 3
 
 
-def train_model(num_epochs, num_batch=4, batch_size=16):
+def train_model(num_epochs: int, num_batch: int = 4, batch_size: int = 16):
     run_logger = Run.get_context()
 
     full_size = num_batch * batch_size
     half_batch = batch_size // 2
 
-    data = load_data(path=dc.TMP_BUTTERFLY_DATA_PATH, full_size=full_size)
-    print(data.shape)
-    print(batch_size)
+    data = load_data(path=dc.TMP_DOG_DATA_PATH, full_size=full_size)
     y_real = np.ones((half_batch, 1))
     y_fake = np.zeros((half_batch, 1))
     ones = np.ones((batch_size, 1))
@@ -37,7 +37,8 @@ def train_model(num_epochs, num_batch=4, batch_size=16):
         metrics_batch = [[] for _ in range(4)]
 
         # batch loop
-        for batch in range(num_batch):
+        for batch in tqdm(range(num_batch),
+                          file=sys.stdout, desc='epoch {}'.format(epoch)):
             metrics = np.zeros(4)
 
             # train discriminator
@@ -61,7 +62,7 @@ def train_model(num_epochs, num_batch=4, batch_size=16):
             metrics[GEN_LOSS_ID:GEN_ACC_ID + 1] = gan.train_on_batch(
                 noise, ones)
 
-            print("batch: {} / {} -- disc loss:{}, gan loss:{}".format(batch +
+            print("\nbatch: {} / {} -- disc loss:{}, gan loss:{}".format(batch +
                   1, num_batch, metrics[DISC_LOSS_ID], metrics[GEN_LOSS_ID]))
 
             # record metrics

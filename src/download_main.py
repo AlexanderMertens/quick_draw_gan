@@ -8,12 +8,7 @@ import os
 if not os.path.exists('/tmp/quick-draw-data'):
     os.makedirs('/tmp/quick-draw-data')
 
-# get workspace
-subscription_id = 'a8260178-3b6d-4bce-a07e-3aae8c7a62af'
-resource_group = 'RG_GAN_internship'
-workspace_name = 'Quick_Draw_Project'
-
-workspace = Workspace(subscription_id, resource_group, workspace_name)
+workspace = Workspace.from_config()
 
 dataset = Dataset.get_by_name(workspace, name='quick_draw')
 dataset.download(target_path='/tmp/quick-draw-data/', overwrite=False)

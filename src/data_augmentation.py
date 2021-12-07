@@ -1,3 +1,6 @@
+"""
+Script to aid filtering images manually.
+"""
 import numpy as np
 import data_help.data_constants as dc
 from data_help.data_transform import convert_to_image
