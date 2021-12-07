@@ -1,3 +1,4 @@
+from typing import Tuple
 from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Conv2D, BatchNormalization, LeakyReLU, Flatten, Dense, Activation, Conv2DTranspose, Reshape
 from tensorflow.python.keras.optimizer_v2.adam import Adam
@@ -84,7 +85,7 @@ def build_generator() -> Sequential:
     return model
 
 
-def build_GAN() -> Sequential:
+def build_GAN() -> Tuple[Sequential, Sequential, Sequential]:
     discriminator = build_discriminator()
     generator = build_generator()
     discriminator.trainable = False

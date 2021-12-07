@@ -19,7 +19,7 @@ print(proper_images.shape)
 for i in range(0, full_size, length):
     selection = images[i: i + length]
     plot_images(selection, numbering=range(0, length),
-                path='figures/data_images.png', save=True, show=False)
+                path='figures/data_images.png', show=False)
     to_remove = []
     while True:
         x = input('Enter index to remove: >> ')

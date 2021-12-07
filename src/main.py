@@ -11,6 +11,8 @@ if __name__ == "__main__":
     os.makedirs('./outputs/figures')
 
     parser = argparse.ArgumentParser(description="Train GAN")
+    parser.add_argument('-p', '--path', type=str,
+                        required=True, help="Path to location of data")
     parser.add_argument('-e', '--epochs', type=int,
                         default=10, help="Amount of epochs")
     parser.add_argument('-b', '--batches', type=int,
@@ -21,7 +23,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     discriminator, generator = train_model(
-        num_epochs=args.epochs, num_batch=args.batches, batch_size=args.size)
+        data_path=args.path, num_epochs=args.epochs, num_batch=args.batches, batch_size=args.size)
 
     tf.saved_model.save(discriminator, './outputs/final_discriminator')
     tf.saved_model.save(generator, './outputs/final_generator')

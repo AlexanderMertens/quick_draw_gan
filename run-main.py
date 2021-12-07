@@ -2,6 +2,8 @@
 Script to setup and run experiment in azure ML studio.
 Saves and registers the final models.
 """
+import src.data_help.data_constants as dc
+
 from azureml.core import Workspace, Experiment, ScriptRunConfig
 from src.utility.azure_help import register_model
 
@@ -12,14 +14,15 @@ if __name__ == "__main__":
 
     # Configure parameters
     num_epochs = 100
-    num_batch = 128
+    num_batch = 256
     batch_size = 1024
     model_name = 'DCGAN-Dog'
 
     # Setup script to run experiment
-    config = ScriptRunConfig(source_directory='.',
-                             script='./src/main.py',
-                             arguments=['--epochs', num_epochs, '--batches', num_batch,
+    config = ScriptRunConfig(source_directory='.', script='./src/main.py',
+                             arguments=['--path', dc.TMP_DOG_DATA_PATH,
+                                        '--epochs', num_epochs,
+                                        '--batches', num_batch,
                                         '--size', batch_size],
                              environment=env)
 

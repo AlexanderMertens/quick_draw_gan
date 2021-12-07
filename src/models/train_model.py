@@ -1,10 +1,9 @@
 import numpy as np
 import tensorflow as tf
 import sys
-import data_help.data_constants as dc
 
 from azureml.core import Run
-from data_help.data_transform import convert_to_image
+from data_help.data_transform import convert_to_image, flip_images_y
 from data_help.make_dataset import generate_random_data, load_data
 from models.build_model import build_GAN
 from visualization.visualise import plot_images, plot_metrics
@@ -16,13 +15,17 @@ GEN_LOSS_ID = 2
 GEN_ACC_ID = 3
 
 
-def train_model(num_epochs: int, num_batch: int = 4, batch_size: int = 16):
+def train_model(data_path: str, num_epochs: int, num_batch: int = 4, batch_size: int = 16):
     run_logger = Run.get_context()
 
     full_size = num_batch * batch_size
     half_batch = batch_size // 2
 
-    data = load_data(path=dc.TMP_DOG_DATA_PATH, full_size=full_size)
+    data = load_data(path=data_path, full_size=full_size // 2)
+    # flip images along y axis and shuffle them among original data
+    data = np.concatenate((data, flip_images_y(data)), axis=0)
+    np.random.shuffle(data)
+
     y_real = np.ones((half_batch, 1))
     y_fake = np.zeros((half_batch, 1))
     ones = np.ones((batch_size, 1))
@@ -71,7 +74,7 @@ def train_model(num_epochs: int, num_batch: int = 4, batch_size: int = 16):
 
         images = convert_to_image(generator.predict(fixed_noise))
         plot_images(
-            images, path="./outputs/figures/epoch_{:003d}".format(epoch), show=False, save=True)
+            images, path="./outputs/figures/epoch_{:003d}".format(epoch), show=False)
         # Save models
         if (epoch + 1) % 10 == 0:
             gen_path = './outputs/generator_epoch_{:003d}'.format(epoch + 1)

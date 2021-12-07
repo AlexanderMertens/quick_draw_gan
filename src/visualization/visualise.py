@@ -1,3 +1,5 @@
+from typing import Iterable
+import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -7,7 +9,7 @@ def visualize_training_data(images, amount_rows=10, show=False, save=False):
                 amount_rows=amount_rows, show=show, save=save)
 
 
-def plot_images(images, path=None, amount_rows=10, show=True, save=False, numbering=None):
+def plot_images(images: np.array, amount_rows: int = 10, path: str = None, show: bool = True, numbering: Iterable = None):
     amount = amount_rows * 10
     fig = plt.figure(figsize=(amount_rows, 10))
     for i in range(amount):
@@ -17,7 +19,7 @@ def plot_images(images, path=None, amount_rows=10, show=True, save=False, number
         if numbering is not None:
             ax.set_title(numbering[i])
     fig.tight_layout()
-    if save:
+    if path is not None:
         fig.savefig(path)
         plt.close(fig)
 
