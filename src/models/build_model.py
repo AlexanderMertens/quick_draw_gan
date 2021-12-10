@@ -1,99 +1,40 @@
-from typing import Tuple
-from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Conv2D, BatchNormalization, LeakyReLU, Flatten, Dense, Activation, Conv2DTranspose, Reshape
-from tensorflow.python.keras.optimizer_v2.adam import Adam
-from azureml.core import Run
-
+import tensorflow as tf
 import data_help.data_constants as dc
 
-
-def build_discriminator() -> Sequential:
-    run_logger = Run.get_context()
-
-    depth = 32
-    dropout = 0.4
-    kernel_size = 3
-    run_logger.log('Discriminator depth', depth)
-    run_logger.log('Discriminator kernel size', kernel_size)
-    input_shape = (dc.IMAGE_WIDTH, dc.IMAGE_WIDTH, 1)
-
-    model = Sequential([
-        # In: 28 x 28 x 1, depth = 1
-        # Out: 14 x 14 x 1, depth=64
-        # [(W−K+2P)/S]+1
-        Conv2D(depth, kernel_size=kernel_size, strides=2,
-               input_shape=input_shape, padding='same'),
-        BatchNormalization(),
-        LeakyReLU(alpha=0.02),
-
-        Conv2D(depth*2, kernel_size=kernel_size,
-               strides=2, padding='same'),
-        BatchNormalization(),
-        LeakyReLU(alpha=0.02),
-
-        Conv2D(depth*4, kernel_size=kernel_size,
-               strides=2, padding='same'),
-        BatchNormalization(),
-        LeakyReLU(alpha=0.02),
-
-        # Out: 1-dim probability
-        Flatten(),
-        Dense(1),
-        Activation('sigmoid'),
-    ])
-
-    lr = 0.0001
-    model.compile(optimizer=Adam(learning_rate=lr), loss='binary_crossentropy',
-                  metrics=['binary_accuracy'])
-    return model
+from tensorflow.python.keras.optimizer_v2.adam import Adam
+from models.WGAN import WGAN
+from models.WGAN_discriminator import get_discriminator_model
+from models.WGAN_generator import get_generator_model
 
 
-def build_generator() -> Sequential:
-    dropout = 0.4
-    depth = 256
-    dim = 7
-    kernel_size = 3
-    run_logger = Run.get_context()
-    run_logger.log('Generator depth', depth)
-    run_logger.log('Generator kernel size', kernel_size)
+def build_wgan():
+    generator_optimizer = Adam(
+        learning_rate=0.0002, beta_1=0.5, beta_2=0.9
+    )
+    discriminator_optimizer = Adam(
+        learning_rate=0.0002, beta_1=0.5, beta_2=0.9
+    )
 
-    model = Sequential([
-        Dense(dim*dim*depth, input_dim=dc.LATENT_DIM),
-        Reshape((dim, dim, depth)),
+    wgan = WGAN(
+        discriminator=get_discriminator_model(),
+        generator=get_generator_model(),
+        latent_dim=dc.LATENT_DIM
+    )
 
-        Conv2DTranspose(
-            int(depth/2), kernel_size=kernel_size, strides=2, padding='same'),
-        BatchNormalization(axis=-1, momentum=0.9),
-        LeakyReLU(alpha=0.02),
-
-        Conv2DTranspose(
-            int(depth/4), kernel_size=kernel_size, strides=1, padding='same'),
-        BatchNormalization(axis=-1, momentum=0.9),
-        LeakyReLU(alpha=0.02),
-
-        Conv2DTranspose(
-            int(depth/8), kernel_size=kernel_size, strides=1, padding='same'),
-        BatchNormalization(axis=-1, momentum=0.9),
-        LeakyReLU(alpha=0.02),
-
-        # Out: 28 x 28 x 1 grayscale image [-1.0,1.0] per pix
-        Conv2DTranspose(
-            1, kernel_size=kernel_size, strides=2, padding='same'),
-        Activation('tanh')
-    ])
-
-    return model
+    wgan.compile(
+        d_optimizer=discriminator_optimizer,
+        g_optimizer=generator_optimizer,
+        d_loss_fn=discriminator_loss,
+        g_loss_fn=generator_loss
+    )
+    return wgan
 
 
-def build_GAN() -> Tuple[Sequential, Sequential, Sequential]:
-    discriminator = build_discriminator()
-    generator = build_generator()
-    discriminator.trainable = False
-    gan = Sequential([
-        generator,
-        discriminator
-    ])
-    lr = 0.0002
-    gan.compile(optimizer=Adam(learning_rate=lr), loss='binary_crossentropy',
-                metrics=['binary_accuracy'])
-    return generator, discriminator, gan
+def discriminator_loss(real_img, fake_img):
+    real_loss = tf.reduce_mean(real_img)
+    fake_loss = tf.reduce_mean(fake_img)
+    return fake_loss - real_loss
+
+
+def generator_loss(fake_img):
+    return -tf.reduce_mean(fake_img)

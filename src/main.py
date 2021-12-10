@@ -2,8 +2,10 @@ import argparse
 import logging
 import os
 import tensorflow as tf
+from data_help.make_dataset import load_data
+from models.build_model import build_wgan
 
-from models.train_model import train_model
+from utility.callbacks import GANMonitor
 
 if __name__ == "__main__":
     logger = tf.get_logger()
@@ -22,8 +24,11 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    discriminator, generator = train_model(
-        data_path=args.path, num_epochs=args.epochs, num_batch=args.batches, batch_size=args.size)
+    real_images = load_data(path=args.path, full_size=None)
 
-    tf.saved_model.save(discriminator, './outputs/final_discriminator')
-    tf.saved_model.save(generator, './outputs/final_generator')
+    wgan = build_wgan()
+    cbk = GANMonitor()
+    wgan.fit(real_images, batch_size=args.size,
+             epochs=args.epochs, callbacks=[cbk])
+
+    tf.saved_model.save(wgan, './outputs/final_wgan')

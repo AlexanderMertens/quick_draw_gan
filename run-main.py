@@ -10,13 +10,13 @@ from src.utility.azure_help import register_model
 if __name__ == "__main__":
     ws = Workspace.from_config()
     env = ws.environments['AzureML-tensorflow-2.4-ubuntu18.04-py37-cuda11-gpu']
-    experiment = Experiment(workspace=ws, name='13-06-experiment-train')
+    experiment = Experiment(workspace=ws, name='12-10-WGAN-training')
 
     # Configure parameters
-    num_epochs = 100
-    num_batch = 256
+    num_epochs = 1
+    num_batch = 150
     batch_size = 1024
-    model_name = 'DCGAN-Dog'
+    model_name = 'WGAN-Dog'
 
     # Setup script to run experiment
     config = ScriptRunConfig(source_directory='.', script='./src/main.py',
@@ -30,8 +30,7 @@ if __name__ == "__main__":
     run.wait_for_completion(show_output=True)
 
     # register final models to azure ml
-    register_model(model_name, 'discriminator', run)
-    register_model(model_name, 'generator', run)
+    register_model(model_name, 'wgan', run)
 
     aml_url = run.get_portal_url()
     print(aml_url)
