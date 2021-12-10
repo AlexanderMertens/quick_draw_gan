@@ -5,9 +5,11 @@ import data_help.data_constants as dc
 import tensorflow as tf
 import os
 
+from visualization.visualise import plot_images
+
 
 class GANMonitor(Callback):
-    def __init__(self, num_img=10, latent_dim=dc.LATENT_DIM):
+    def __init__(self, num_img=100, latent_dim=dc.LATENT_DIM):
         self.num_img = num_img
         self.latent_dim = latent_dim
 
@@ -18,8 +20,5 @@ class GANMonitor(Callback):
         generated_images = (generated_images * 127.5) + 127.5
 
         os.makedirs("outputs/figures", exist_ok=True)
-        for i in range(self.num_img):
-            img = generated_images[i].numpy()
-            img = array_to_img(img)
-            img.save(
-                "outputs/figures/generated_img_{i}_{epoch}.png".format(i=i, epoch=epoch))
+        plot_images(
+            generated_images, path="./outputs/figures/epoch_{:003d}".format(epoch), show=False)

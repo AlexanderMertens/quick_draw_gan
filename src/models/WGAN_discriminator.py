@@ -16,7 +16,7 @@ import data_help.data_constants as dc
 
 def get_discriminator_model():
     img_input = Input(shape=dc.IMG_SHAPE)
-    filters = 64
+    filters = 32
     # Zero pad the input to make the input images size to (32, 32, 1).
     x = ZeroPadding2D((2, 2))(img_input)
     x = conv_block(

@@ -17,14 +17,12 @@ if __name__ == "__main__":
                         required=True, help="Path to location of data")
     parser.add_argument('-e', '--epochs', type=int,
                         default=10, help="Amount of epochs")
-    parser.add_argument('-b', '--batches', type=int,
-                        default=16, help="Amount of batches")
     parser.add_argument('-s', '--size', type=int,
                         default=128, help="Size of batches")
 
     args = parser.parse_args()
 
-    real_images = load_data(path=args.path, full_size=None)
+    real_images = load_data(path=args.path, full_size=None)[:2048]
 
     wgan = build_wgan()
     cbk = GANMonitor()
