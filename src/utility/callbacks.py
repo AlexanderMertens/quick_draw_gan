@@ -8,14 +8,15 @@ import os
 from visualization.visualise import plot_images
 
 
+random_latent_vectors = tf.random.normal(
+    shape=(100, dc.LATENT_DIM))
+
 class GANMonitor(Callback):
     def __init__(self, num_img=100, latent_dim=dc.LATENT_DIM):
         self.num_img = num_img
         self.latent_dim = latent_dim
 
     def on_epoch_end(self, epoch, logs=None):
-        random_latent_vectors = tf.random.normal(
-            shape=(self.num_img, self.latent_dim))
         generated_images = self.model.generator(random_latent_vectors)
         generated_images = (generated_images * 127.5) + 127.5
 

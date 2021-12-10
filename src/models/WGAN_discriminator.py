@@ -22,7 +22,6 @@ def get_discriminator_model():
     x = conv_block(
         x,
         filters,
-        kernel_size=(5, 5),
         strides=(2, 2),
         use_bn=True,
     )
@@ -30,37 +29,27 @@ def get_discriminator_model():
     x = conv_block(
         x,
         2 * filters,
-        kernel_size=(5, 5),
         strides=(2, 2),
         use_bn=True,
-        use_dropout=True,
-        drop_value=0.3,
     )
     # Output: (None, 128, 8, 8)
     x = conv_block(
         x,
         4 * filters,
-        kernel_size=(5, 5),
         strides=(2, 2),
         use_bn=True,
-        use_dropout=True,
-        drop_value=0.3,
     )
     # Output: (None, 256, 4, 4)
     x = conv_block(
         x,
         8 * filters,
-        kernel_size=(5, 5),
         strides=(2, 2),
         use_bn=True,
-        use_dropout=False,
-        drop_value=0.3,
     )
     # Output: (None, 256, 2, 2)
 
     x = Flatten()(x)
     # Output: (None, 2 * 2 * 256)
-    x = Dropout(0.2)(x)
     x = Dense(1)(x)
 
     d_model = Model(img_input, x, name="discriminator")

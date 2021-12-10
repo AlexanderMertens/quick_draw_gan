@@ -22,7 +22,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    real_images = load_data(path=args.path, full_size=None)[:2048]
+    real_images = load_data(path=args.path, full_size=64 * 1024)
+    print('data-shape', real_images.shape)
 
     wgan = build_wgan()
     cbk = GANMonitor()

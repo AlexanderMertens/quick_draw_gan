@@ -13,13 +13,13 @@ if __name__ == "__main__":
     experiment = Experiment(workspace=ws, name='12-10-WGAN-training')
 
     # Configure parameters
-    num_epochs = 1
+    num_epochs = 60
     batch_size = 1024
-    model_name = 'WGAN-Dog'
+    model_name = 'WGAN-Butterfly'
 
     # Setup script to run experiment
     config = ScriptRunConfig(source_directory='.', script='./src/main.py',
-                             arguments=['--path', dc.TMP_DOG_DATA_PATH,
+                             arguments=['--path', dc.TMP_BUTTERFLY_DATA_PATH,
                                         '--epochs', num_epochs,
                                         '--size', batch_size],
                              environment=env)
