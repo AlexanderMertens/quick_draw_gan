@@ -31,7 +31,7 @@ def build_discriminator() -> Sequential:
         kernel_size=kernel_size_3,
         strides=strides_2,
         use_bn=True,
-        activation=LeakyReLU(0.2)
+        activation=LeakyReLU(0.02)
     )
     # Out: (None, 32, 16, 16, 1)
     x = conv_block(
@@ -40,7 +40,7 @@ def build_discriminator() -> Sequential:
         kernel_size=kernel_size_3,
         strides=strides_2,
         use_bn=True,
-        activation=LeakyReLU(0.2)
+        activation=LeakyReLU(0.02)
     )
 
     # Out: (None, 64, 8, 8, 1)
@@ -50,12 +50,12 @@ def build_discriminator() -> Sequential:
         kernel_size=kernel_size_3,
         strides=strides_2,
         use_bn=True,
-        activation=LeakyReLU(0.2)
+        activation=LeakyReLU(0.02)
     )
     # Out: (None, 128, 4, 4, 1)
 
     x = Flatten()(x)
-    x = Dense(1, activation='sigmoid')(x)
+    x = Dense(1, activation=Activation('sigmoid'))(x)
 
     d_model = Model(img_input, x, name="discriminator")
     lr = 0.0001
@@ -75,7 +75,7 @@ def build_generator() -> Sequential:
 
     noise = Input(shape=(dc.LATENT_DIM,))
     x = Dense(4 * 4 * filters, use_bias=False)(noise)
-    x = Reshape((dc.IMAGE_WIDTH, dc.IMAGE_WIDTH, filters))(x)
+    x = Reshape((4, 4, filters))(x)
 
     # Out: (4, 4, 256)
     x = upsample_block(
@@ -100,7 +100,7 @@ def build_generator() -> Sequential:
     x = upsample_block(
         x,
         filters=filters // 8,
-        activation=LeakyReLU(0.2),
+        activation=LeakyReLU(0.02),
         kernel_size=kernel_size_3,
         strides=strides_2,
         use_bn=True
@@ -111,7 +111,7 @@ def build_generator() -> Sequential:
         filters=1,
         kernel_size=kernel_size_3,
         strides=(1, 1),
-        activation='tanh'
+        activation=Activation('tanh')
     )
     # Out: (32, 32, 1)
     x = Cropping2D((2, 2))(x)
