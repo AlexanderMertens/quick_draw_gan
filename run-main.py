@@ -15,12 +15,14 @@ if __name__ == "__main__":
     num_epochs = 80
     num_batch = 128
     batch_size = 1024
-    data_path = load_config('config.yaml')['data']['dog_path']
-    model_name = 'DCGAN-Dog'
+    data_path = load_config('config.yaml')['data']['folder']
+    name = 'whale'
+    model_name = 'DCGAN-{}'.format(name.capitalize())
 
     # Setup script to run experiment
     config = ScriptRunConfig(source_directory='.', script='./src/main.py',
                              arguments=['--path', data_path,
+                                        '--name', name,
                                         '--epochs', num_epochs,
                                         '--batches', num_batch,
                                         '--size', batch_size],

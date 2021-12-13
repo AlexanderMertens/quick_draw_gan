@@ -1,7 +1,10 @@
 data:
   # location of data paths
+  folder: "/tmp/quick-draw-data"
   dog_path: "/tmp/quick-draw-data/dog.npy"
   butterfly_path: "/tmp/quick-draw-data/butterfly.npy"
+  spider_path: "/tmp/quick-draw-data/spider.npy"
+  fish_path: "/tmp/quick-draw-data/fish.npy"
 
 dimensions:
   # dimension of latent space
