@@ -1,5 +1,4 @@
 from typing import Tuple
-from tensorflow.python.keras.backend import dropout
 from tensorflow.python.keras.layers.convolutional import Cropping2D, ZeroPadding2D
 from tensorflow.python.keras.models import Model, Sequential
 from tensorflow.python.keras.layers import Conv2D, BatchNormalization, LeakyReLU, Flatten, Dense, Activation, Conv2DTranspose, Reshape
@@ -7,60 +6,62 @@ from tensorflow.python.keras.layers import Layer
 from tensorflow.python.keras.layers import Dropout
 from tensorflow.python.keras.layers import Input
 from tensorflow.python.keras.optimizer_v2.adam import Adam
-from azureml.core import Run
 
-import data_help.data_constants as dc
+from utility.load_config import load_config
 
 
 def build_discriminator() -> Sequential:
-    run_logger = Run.get_context()
+    config = load_config('config.yaml')
 
-    filters = 32
-    strides_2 = (2, 2)
-    kernel_size_3 = (4, 4)
-    run_logger.log('Discriminator filters', filters)
-    run_logger.log('Discriminator kernel size', kernel_size_3)
+    dimensions = config['dimensions']
+    config_d = config['discriminator']
+
+    filters = config_d['filters']
+    strides = config_d['strides']
+    kernel_size = config_d['kernel_size']
+    alpha = config_d['alpha_leaky']
+    dropout_rate = config_d['dropout']
 
     # IN: (None, 28, 28, 1)
-    img_input = Input(dc.IMG_SHAPE)
+    img_input = Input(dimensions['img_shape'])
     x = ZeroPadding2D((2, 2))(img_input)
     # Out: (None, 32, 32, 1)
 
     x = conv_block(
         x,
         filters,
-        kernel_size=kernel_size_3,
-        strides=strides_2,
+        kernel_size=kernel_size,
+        strides=strides,
         use_bn=True,
-        activation=LeakyReLU(0.2)
+        activation=LeakyReLU(alpha)
     )
     # Out: (None, 32, 16, 16, 1)
     x = conv_block(
         x,
         2 * filters,
-        kernel_size=kernel_size_3,
-        strides=strides_2,
+        kernel_size=kernel_size,
+        strides=strides,
         use_bn=True,
-        activation=LeakyReLU(0.2)
+        activation=LeakyReLU(alpha)
     )
 
     # Out: (None, 64, 8, 8, 1)
     x = conv_block(
         x,
         4 * filters,
-        kernel_size=kernel_size_3,
-        strides=strides_2,
+        kernel_size=kernel_size,
+        strides=strides,
         use_bn=True,
-        activation=LeakyReLU(0.2)
+        activation=LeakyReLU(alpha)
     )
     # Out: (None, 128, 4, 4, 1)
 
     x = Flatten()(x)
-    x = Dropout(0.4)(x)
+    x = Dropout(dropout_rate)(x)
     x = Dense(1, activation=Activation('sigmoid'))(x)
 
     d_model = Model(img_input, x, name="discriminator")
-    lr = 0.0001
+    lr = config_d['learning_rate']
     d_model.compile(optimizer=Adam(learning_rate=lr, beta_1=0.5), loss='binary_crossentropy',
                     metrics=['binary_accuracy'])
     d_model.summary()
@@ -68,14 +69,16 @@ def build_discriminator() -> Sequential:
 
 
 def build_generator() -> Sequential:
-    filters = 256
-    kernel_size_3 = (4, 4)
-    strides_2 = (2, 2)
-    run_logger = Run.get_context()
-    run_logger.log('Generator filters', filters)
-    run_logger.log('Generator kernel size', kernel_size_3)
+    config = load_config('config.yaml')
+    config_g = config['generator']
+    dimensions = config['dimensions']
 
-    noise = Input(shape=(dc.LATENT_DIM,))
+    filters = config_g['filters']
+    kernel_size = config_g['kernel_size']
+    strides = config_g['strides']
+    alpha = config_g['alpha_leaky']
+
+    noise = Input(shape=(dimensions['latent'],))
     x = Dense(4 * 4 * filters, use_bias=False)(noise)
     x = Reshape((4, 4, filters))(x)
 
@@ -83,9 +86,9 @@ def build_generator() -> Sequential:
     x = upsample_block(
         x,
         filters=filters // 2,
-        activation=LeakyReLU(0.2),
-        kernel_size=kernel_size_3,
-        strides=strides_2,
+        activation=LeakyReLU(alpha),
+        kernel_size=kernel_size,
+        strides=strides,
         use_bn=True
     )
 
@@ -93,25 +96,25 @@ def build_generator() -> Sequential:
     x = upsample_block(
         x,
         filters=filters // 4,
-        activation=LeakyReLU(0.2),
-        kernel_size=kernel_size_3,
-        strides=strides_2,
+        activation=LeakyReLU(alpha),
+        kernel_size=kernel_size,
+        strides=strides,
         use_bn=True
     )
     # Out: (16, 16, 64)
     x = upsample_block(
         x,
         filters=filters // 8,
-        activation=LeakyReLU(0.2),
-        kernel_size=kernel_size_3,
-        strides=strides_2,
+        activation=LeakyReLU(alpha),
+        kernel_size=kernel_size,
+        strides=strides,
         use_bn=True
     )
     # Out: (32, 32, 32)
     x = upsample_block(
         x,
         filters=1,
-        kernel_size=kernel_size_3,
+        kernel_size=kernel_size,
         strides=(1, 1),
         activation=Activation('tanh')
     )
@@ -125,6 +128,7 @@ def build_generator() -> Sequential:
 
 
 def build_GAN() -> Tuple[Sequential, Sequential, Sequential]:
+    config_g = load_config('config.yaml')['gan']
     discriminator = build_discriminator()
     generator = build_generator()
     discriminator.trainable = False
@@ -132,7 +136,7 @@ def build_GAN() -> Tuple[Sequential, Sequential, Sequential]:
         generator,
         discriminator
     ])
-    lr = 0.0002
+    lr = config_g['learning_rate']
     gan.compile(optimizer=Adam(learning_rate=lr, beta_1=0.5), loss='binary_crossentropy',
                 metrics=['binary_accuracy'])
     return generator, discriminator, gan

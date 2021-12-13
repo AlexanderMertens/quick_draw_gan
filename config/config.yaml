@@ -1,0 +1,32 @@
+data:
+  # location of data paths
+  dog_path: "/tmp/quick-draw-data/dog.npy"
+  butterfly_path: "/tmp/quick-draw-data/butterfly.npy"
+
+dimensions:
+  # dimension of latent space
+  latent: 100
+  # (width, height, nr_channels) of images
+  img_shape: !!python/tuple [28, 28, 1]
+  # total nr of pixels of images (width * height * nr_channels)
+  input_length: 754
+
+# parameters for discriminator DCGAN
+discriminator:
+  filters: 32
+  kernel_size: !!python/tuple [4, 4]
+  strides: !!python/tuple [2, 2]
+  dropout: 0.4
+  alpha_leaky: 0.2
+  learning_rate: 0.0001
+
+# parameters for generator DCGAN
+generator:
+  filters: 256
+  kernel_size: !!python/tuple [4, 4]
+  strides: !!python/tuple [2, 2]
+  alpha_leaky: 0.2
+
+# general parameters for DCGAN
+gan:
+  learning_rate: 0.0002

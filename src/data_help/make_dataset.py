@@ -1,8 +1,8 @@
 """Module containing functions that help load and generate data."""
 import numpy as np
-import data_help.data_constants as dc
 
 from data_help.data_transform import convert_to_image
+from utility.load_config import load_config
 
 
 def load_data(path: str, full_size: int = 1000, verbose: bool = False) -> np.array:
@@ -52,4 +52,5 @@ def generate_random_data(num_samples: int) -> np.array:
     Returns:
         np.array: array of latent vectors.
     """
-    return np.random.normal(0, 1, (num_samples, dc.LATENT_DIM))
+    dimensions = load_config('config.yaml')['dimensions']
+    return np.random.normal(0, 1, (num_samples, dimensions['latent']))
