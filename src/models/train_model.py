@@ -21,10 +21,7 @@ def train_model(data_path: str, num_epochs: int, num_batch: int = 4, batch_size:
     full_size = num_batch * batch_size
     half_batch = batch_size // 2
 
-    data = load_data(path=data_path, full_size=full_size // 2)
-    # flip images along y axis and shuffle them among original data
-    data = np.concatenate((data, flip_images_y(data)), axis=0)
-    np.random.shuffle(data)
+    data = load_data(path=data_path, full_size=full_size)
 
     y_real = np.ones((half_batch, 1))
     y_fake = np.zeros((half_batch, 1))

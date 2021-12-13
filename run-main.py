@@ -10,17 +10,17 @@ from src.utility.azure_help import register_model
 if __name__ == "__main__":
     ws = Workspace.from_config()
     env = ws.environments['AzureML-tensorflow-2.4-ubuntu18.04-py37-cuda11-gpu']
-    experiment = Experiment(workspace=ws, name='13-06-experiment-train')
+    experiment = Experiment(workspace=ws, name='13-13-experiment-train')
 
     # Configure parameters
-    num_epochs = 100
-    num_batch = 256
+    num_epochs = 80
+    num_batch = 128
     batch_size = 1024
-    model_name = 'DCGAN-Dog'
+    model_name = 'DCGAN-Butterfly'
 
     # Setup script to run experiment
     config = ScriptRunConfig(source_directory='.', script='./src/main.py',
-                             arguments=['--path', dc.TMP_DOG_DATA_PATH,
+                             arguments=['--path', dc.TMP_BUTTERFLY_DATA_PATH,
                                         '--epochs', num_epochs,
                                         '--batches', num_batch,
                                         '--size', batch_size],
