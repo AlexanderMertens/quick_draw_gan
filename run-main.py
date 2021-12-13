@@ -16,11 +16,11 @@ if __name__ == "__main__":
     num_epochs = 80
     num_batch = 128
     batch_size = 1024
-    model_name = 'DCGAN-Butterfly'
+    model_name = 'DCGAN-Dog'
 
     # Setup script to run experiment
     config = ScriptRunConfig(source_directory='.', script='./src/main.py',
-                             arguments=['--path', dc.TMP_BUTTERFLY_DATA_PATH,
+                             arguments=['--path', dc.TMP_DOG_DATA_PATH,
                                         '--epochs', num_epochs,
                                         '--batches', num_batch,
                                         '--size', batch_size],
