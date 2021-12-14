@@ -16,7 +16,7 @@ dimensions:
 
 # parameters for discriminator DCGAN
 discriminator:
-  filters: 32
+  filters: 64
   kernel_size: !!python/tuple [4, 4]
   strides: !!python/tuple [2, 2]
   dropout: 0.4
@@ -25,7 +25,7 @@ discriminator:
 
 # parameters for generator DCGAN
 generator:
-  filters: 256
+  filters: 512
   kernel_size: !!python/tuple [4, 4]
   strides: !!python/tuple [2, 2]
   alpha_leaky: 0.2
