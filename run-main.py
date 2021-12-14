@@ -9,14 +9,14 @@ from src.utility.load_config import load_config
 if __name__ == "__main__":
     ws = Workspace.from_config()
     env = ws.environments['AzureML-tensorflow-2.4-ubuntu18.04-py37-cuda11-gpu']
-    experiment = Experiment(workspace=ws, name='13-13-experiment-train')
+    experiment = Experiment(workspace=ws, name='13-14-experiment-train')
 
     # Configure parameters
     num_epochs = 80
     num_batch = 128
     batch_size = 1024
     data_path = load_config('config.yaml')['data']['folder']
-    name = 'whale'
+    name = 'fish'
     model_name = 'DCGAN-{}'.format(name.capitalize())
 
     # Setup script to run experiment

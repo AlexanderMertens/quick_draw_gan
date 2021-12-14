@@ -1,6 +1,5 @@
 import argparse
 import os
-import tensorflow as tf
 
 from models.train_model import train_model
 from scripts.download_data import download_data
@@ -34,5 +33,5 @@ if __name__ == "__main__":
         batch_size=args.size)
 
     # Save models at last epoch
-    tf.saved_model.save(discriminator, './outputs/final_discriminator')
-    tf.saved_model.save(generator, './outputs/final_generator')
+    discriminator.save('./outputs/discriminator')
+    generator.save('./outputs/generator')

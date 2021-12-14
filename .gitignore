@@ -7,3 +7,4 @@ figures/
 weights/
 mlruns/
 outputs/
+saved_model/
