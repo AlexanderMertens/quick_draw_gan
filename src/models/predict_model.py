@@ -59,32 +59,34 @@ def image_float_to_int(images: np.array) -> np.array:
     return images
 
 
-def filter_images(images: np.array, discriminator: Model) -> np.array:
+def filter_images(images: np.array, discriminator: Model, quality: float) -> np.array:
     # Probabilities the images are real according to discriminator.
     # i.e. quality of the image.
     probs = np.array(discriminator(images))
     # Filter any images of too low a quality
-    filter = [probability[0] < 0.75 for probability in probs]
+    filter = [probability[0] > quality for probability in probs]
     return images[filter]
 
 
-def generate_quality_images(generator: Model, discriminator: Model, num_samples: int) -> np.array:
+def generate_quality_images(generator: Model, discriminator: Model, num_samples: int, quality: float = 0.5) -> np.array:
     """Generate only images of appropriate quality.
 
     Args:
         generator (Model): Generator model that generators images.
         discriminator (Model): Discriminator model that judges images quality.
         num_samples (int): Number of samples to be generated.
+        quality (float): Float between 0.0 and 1.0 representing quality of the images. Defaults to 0.5
 
     Returns:
         np.array: Array containing images.
     """
     quality_images = filter_images(
-        generate_images(generator, 100), discriminator)
+        generate_images(generator, 100), discriminator, quality=quality)
     while quality_images.shape[0] < num_samples:
         new_images = filter_images(
-            generate_images(generator, 100), discriminator)
-        quality_images = np.append((quality_images, new_images))
+            generate_images(generator, 100), discriminator, quality=quality)
+        quality_images = np.concatenate((quality_images, new_images))
+        print(quality_images.shape)
     return quality_images[:num_samples]
 
 
@@ -94,7 +96,6 @@ def save_images(images: np.array):
     Args:
         images (np.array): Data of images to be saved.
     """
-    images = image_float_to_int(images)
     for image_data, n in zip(images, range(len(images))):
         image = im.fromarray(image_data)
         image = ImageChops.invert(image)
